@@ -125,7 +125,15 @@ public class Zip extends CordovaPlugin {
                    File dir = new File(outputDirectory + compressedName);
                    dir.mkdirs();
                 } else {
-                    File file = new File(outputDirectory + compressedName);
+                     File file = new File(outputDirectory + compressedName);
+                     String canonicalDestinationPath = (new File(outputDirectory)).getCanonicalPath();
+                     String canonicalPath = file.getCanonicalPath();
+                     if (!canonicalPath.startsWith(canonicalDestinationPath)) {
+                        String errorMessage = "Zip traversal security error";
+                        callbackContext.error(errorMessage);
+                        Log.e(LOG_TAG, errorMessage);
+                        return;
+                    }
                     file.getParentFile().mkdirs();
                     if(file.exists() || file.createNewFile()){
                         Log.w("Zip", "extracting: " + file.getPath());
